@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Nueva Tarea - Mini ERP{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-check2-square"></i> {{ accion }} Tarea</h2>
+    <a href="{% url 'lista_tareas' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-bold">Título de la Tarea</label>
+                    <input type="text" name="titulo" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="en_progreso">En Progreso</option>
+                        <option value="completada">Completada</option>
+                        <option value="vencida">Vencida</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">Descripción</label>
+                    <textarea name="descripcion" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Proyecto</label>
+                    <select name="proyecto" class="form-select" required>
+                        <option value="">Seleccioná un proyecto</option>
+                        {% for proyecto in proyectos %}
+                        <option value="{{ proyecto.pk }}">{{ proyecto.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Asignado a</label>
+                    <select name="asignado_a" class="form-select">
+                        <option value="">Sin asignar</option>
+                        {% for col in colaboradores %}
+                        <option value="{{ col.pk }}">{{ col.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Fecha límite</label>
+                    <input type="date" name="fecha_limite" class="form-control" required>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-save"></i> Guardar Tarea
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

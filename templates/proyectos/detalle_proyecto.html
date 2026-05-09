@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ proyecto.nombre }} - Mini ERP{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-kanban-fill"></i> {{ proyecto.nombre }}</h2>
+    <div>
+        <a href="{% url 'editar_proyecto' proyecto.pk %}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+        <a href="{% url 'lista_proyectos' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Info del proyecto -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <i class="bi bi-info-circle"></i> Información General
+            </div>
+            <div class="card-body">
+                <p><strong>Estado:</strong>
+                    <span class="badge 
+                        {% if proyecto.estado == 'en_riesgo' %}bg-danger
+                        {% elif proyecto.estado == 'completado' %}bg-success
+                        {% elif proyecto.estado == 'en_progreso' %}bg-primary
+                        {% elif proyecto.estado == 'cancelado' %}bg-secondary
+                        {% else %}bg-warning text-dark{% endif %}">
+                        {{ proyecto.get_estado_display }}
+                    </span>
+                </p>
+                <p><strong>Descripción:</strong><br>
+                    <span class="text-muted">{{ proyecto.descripcion|default:"Sin descripción" }}</span>
+                </p>
+                <p><strong>Fecha inicio:</strong> {{ proyecto.fecha_inicio }}</p>
+                <p><strong>Fecha fin:</strong> {{ proyecto.fecha_fin }}</p>
+                <p><strong>Responsable:</strong> {{ proyecto.responsable|default:"Sin asignar" }}</p>
+            </div>
+        </div>
+
+        <!-- Colaboradores -->
+        <div class="card mt-3">
+            <div class="card-header bg-dark text-white">
+                <i class="bi bi-people"></i> Colaboradores
+            </div>
+            <div class="card-body">
+                {% for col in proyecto.colaboradores.all %}
+                    <span class="badge bg-secondary me-1 mb-1">{{ col.nombre }}</span>
+                {% empty %}
+                    <span class="text-muted">Sin colaboradores asignados</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tareas -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-dark text-white d-flex justify-content-between">
+                <span><i class="bi bi-check2-square"></i> Tareas</span>
+                <a href="{% url 'crear_tarea' %}" class="btn btn-sm btn-light">
+                    <i class="bi bi-plus"></i> Nueva Tarea
+                </a>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Tarea</th>
+                            <th>Asignado a</th>
+                            <th>Fecha límite</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tarea in tareas %}
+                        <tr>
+                            <td>{{ tarea.titulo }}</td>
+                            <td>{{ tarea.asignado_a|default:"Sin asignar" }}</td>
+                            <td>{{ tarea.fecha_limite }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if tarea.estado == 'completada' %}bg-success
+                                    {% elif tarea.estado == 'en_progreso' %}bg-primary
+                                    {% elif tarea.estado == 'vencida' %}bg-danger
+                                    {% else %}bg-warning text-dark{% endif %}">
+                                    {{ tarea.get_estado_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">
+                                No hay tareas registradas para este proyecto.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

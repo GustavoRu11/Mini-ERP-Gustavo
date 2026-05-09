@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ accion }} Proyecto - Mini ERP{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-kanban-fill"></i> {{ accion }} Proyecto</h2>
+    <a href="{% url 'lista_proyectos' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-bold">Nombre del Proyecto</label>
+                    <input type="text" name="nombre" class="form-control"
+                        value="{{ proyecto.nombre|default:'' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="planificacion" {% if proyecto.estado == 'planificacion' %}selected{% endif %}>En Planificación</option>
+                        <option value="en_progreso" {% if proyecto.estado == 'en_progreso' %}selected{% endif %}>En Progreso</option>
+                        <option value="completado" {% if proyecto.estado == 'completado' %}selected{% endif %}>Completado</option>
+                        <option value="en_riesgo" {% if proyecto.estado == 'en_riesgo' %}selected{% endif %}>En Riesgo</option>
+                        <option value="cancelado" {% if proyecto.estado == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">Descripción</label>
+                    <textarea name="descripcion" class="form-control" rows="3">{{ proyecto.descripcion|default:'' }}</textarea>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Fecha de Inicio</label>
+                    <input type="date" name="fecha_inicio" class="form-control"
+                        value="{{ proyecto.fecha_inicio|default:'' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Fecha de Fin</label>
+                    <input type="date" name="fecha_fin" class="form-control"
+                        value="{{ proyecto.fecha_fin|default:'' }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Responsable</label>
+                    <select name="responsable" class="form-select">
+                        <option value="">Sin responsable</option>
+                        {% for col in colaboradores %}
+                        <option value="{{ col.pk }}" 
+                            {% if proyecto.responsable.pk == col.pk %}selected{% endif %}>
+                            {{ col.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label fw-bold">Colaboradores del Proyecto</label>
+                    <div class="row g-2">
+                        {% for col in colaboradores %}
+                        <div class="col-md-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                    name="colaboradores" value="{{ col.pk }}"
+                                    {% if col in proyecto.colaboradores.all %}checked{% endif %}>
+                                <label class="form-check-label">{{ col.nombre }}</label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-save"></i> {{ accion }} Proyecto
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
