@@ -26,24 +26,37 @@
                 <i class="bi bi-grid-3x3-gap-fill"></i> Mini ERP
             </div>
             <nav class="nav flex-column mt-3">
-                <a class="nav-link" href="/"><i class="bi bi-speedometer2"></i> Dashboard</a>
-                <hr style="border-color:#0f3460; margin: 10px 20px;">
-                <small class="text-muted px-4 mb-1" style="font-size:0.7rem;">PROYECTOS</small>
-                <a class="nav-link" href="/proyectos/"><i class="bi bi-kanban"></i> Proyectos</a>
-                <a class="nav-link" href="/tareas/"><i class="bi bi-check2-square"></i> Tareas</a>
-                <hr style="border-color:#0f3460; margin: 10px 20px;">
-                <small class="text-muted px-4 mb-1" style="font-size:0.7rem;">RECURSOS</small>
-                <a class="nav-link" href="/colaboradores/"><i class="bi bi-people"></i> Colaboradores</a>
-                <hr style="border-color:#0f3460; margin: 10px 20px;">
-                <a class="nav-link" href="/admin/"><i class="bi bi-shield-lock"></i> Admin</a>
-                    <hr style="border-color:#0f3460; margin: 10px 20px;">
-                    <form method="post" action="/logout/">
-                        {% csrf_token %}
-                        <button type="submit" class="nav-link btn btn-link w-100 text-start" style="color:#e94560;">
-                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-                        </button>
-                    </form>
-            </nav>
+    <a class="nav-link" href="/"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <hr style="border-color:#0f3460; margin: 10px 20px;">
+    <small class="text-muted px-4 mb-1" style="font-size:0.7rem;">PROYECTOS</small>
+    <a class="nav-link" href="/proyectos/"><i class="bi bi-kanban"></i> Proyectos</a>
+    <a class="nav-link" href="/tareas/"><i class="bi bi-check2-square"></i> Tareas</a>
+    <hr style="border-color:#0f3460; margin: 10px 20px;">
+    <small class="text-muted px-4 mb-1" style="font-size:0.7rem;">RECURSOS</small>
+    <a class="nav-link" href="/colaboradores/"><i class="bi bi-people"></i> Colaboradores</a>
+    {% if request.user.perfil.rol == 'admin' %}
+    <hr style="border-color:#0f3460; margin: 10px 20px;">
+    <small class="text-muted px-4 mb-1" style="font-size:0.7rem;">ADMINISTRACIÓN</small>
+    <a class="nav-link" href="/admin/"><i class="bi bi-shield-lock"></i> Admin Panel</a>
+    {% endif %}
+    <hr style="border-color:#0f3460; margin: 10px 20px;">
+    <div class="px-4 mb-1" style="font-size:0.75rem; color:#a8b2d8;">
+    <i class="bi bi-person-circle"></i> {{ request.user.username }}<br>
+    {% if request.user.perfil.rol == 'admin' %}
+        <span style="color:#e94560;">🔴 Administrador</span>
+    {% elif request.user.perfil.rol == 'gerente' %}
+        <span style="color:#ffc107;">🟡 Gerente</span>
+    {% else %}
+        <span style="color:#1db954;">🟢 Colaborador</span>
+    {% endif %}
+</div>
+    <form method="post" action="/logout/">
+        {% csrf_token %}
+        <button type="submit" class="nav-link btn btn-link w-100 text-start" style="color:#e94560;">
+            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+        </button>
+    </form>
+</nav>
         </div>
         <div class="col-md-10 main-content">
             {% if messages %}

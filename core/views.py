@@ -1,7 +1,19 @@
+def es_admin(user):
+    try:
+        return user.perfil.rol == 'admin'
+    except:
+        return False
+
+def es_gerente_o_admin(user):
+    try:
+        return user.perfil.rol in ['admin', 'gerente']
+    except:
+        return False
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib import messages
+from .models import Perfil
 
 def registro(request):
     if request.method == 'POST':
@@ -11,6 +23,7 @@ def registro(request):
             user.first_name = request.POST.get('first_name', '')
             user.email = request.POST.get('email', '')
             user.save()
+            Perfil.objects.create(usuario=user, rol='colaborador')
             login(request, user)
             messages.success(request, f'¡Bienvenido {user.first_name or user.username}! Tu cuenta fue creada exitosamente.')
             return redirect('home')

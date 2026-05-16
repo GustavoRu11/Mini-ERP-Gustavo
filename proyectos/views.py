@@ -1,16 +1,28 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count
 from .models import Proyecto, Tarea
 from recursos.models import Colaborador
+
+def es_admin(user):
+    try:
+        return user.perfil.rol == 'admin'
+    except:
+        return False
+
+def es_gerente_o_admin(user):
+    try:
+        return user.perfil.rol in ['admin', 'gerente']
+    except:
+        return False
 
 @login_required
 def lista_proyectos(request):
     proyectos = Proyecto.objects.all()
     return render(request, 'proyectos/lista_proyectos.html', {'proyectos': proyectos})
 
-@login_required
+@user_passes_test(es_gerente_o_admin, login_url='/login/')
 def crear_proyecto(request):
     colaboradores = Colaborador.objects.all()
     if request.method == 'POST':
@@ -41,7 +53,7 @@ def detalle_proyecto(request, pk):
     tareas = proyecto.tareas.all()
     return render(request, 'proyectos/detalle_proyecto.html', {'proyecto': proyecto, 'tareas': tareas})
 
-@login_required
+@user_passes_test(es_gerente_o_admin, login_url='/login/')
 def editar_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     colaboradores = Colaborador.objects.all()
@@ -59,7 +71,7 @@ def editar_proyecto(request, pk):
         return redirect('lista_proyectos')
     return render(request, 'proyectos/form_proyecto.html', {'accion': 'Editar', 'proyecto': proyecto, 'colaboradores': colaboradores})
 
-@login_required
+@user_passes_test(es_admin, login_url='/login/')
 def eliminar_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     if request.method == 'POST':
@@ -73,7 +85,7 @@ def lista_tareas(request):
     tareas = Tarea.objects.all()
     return render(request, 'proyectos/lista_tareas.html', {'tareas': tareas})
 
-@login_required
+@user_passes_test(es_gerente_o_admin, login_url='/login/')
 def crear_tarea(request):
     proyectos = Proyecto.objects.all()
     colaboradores = Colaborador.objects.all()
