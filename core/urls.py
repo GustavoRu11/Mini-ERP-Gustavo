@@ -8,5 +8,6 @@ urlpatterns = [
     path('colaboradores/', include('recursos.urls')),
     path('tareas/', proyectos_views.lista_tareas, name='lista_tareas'),
     path('tareas/crear/', proyectos_views.crear_tarea, name='crear_tarea'),
-    path('', proyectos_views.lista_proyectos, name='home'),
+    path('dashboard/', proyectos_views.dashboard, name='dashboard'),
+    path('', proyectos_views.dashboard, name='home'),
 ]

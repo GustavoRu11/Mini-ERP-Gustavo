@@ -86,3 +86,47 @@ def crear_tarea(request):
         messages.success(request, 'Tarea creada exitosamente.')
         return redirect('lista_tareas')
     return render(request, 'proyectos/form_tarea.html', {'accion': 'Crear', 'proyectos': proyectos, 'colaboradores': colaboradores})
+
+
+from django.db.models import Count
+
+def dashboard(request):
+    total_proyectos = Proyecto.objects.count()
+    proyectos_en_progreso = Proyecto.objects.filter(estado='en_progreso').count()
+    proyectos_completados = Proyecto.objects.filter(estado='completado').count()
+    proyectos_en_riesgo = Proyecto.objects.filter(estado='en_riesgo').count()
+    proyectos_planificacion = Proyecto.objects.filter(estado='planificacion').count()
+
+    total_colaboradores = Colaborador.objects.count()
+    colaboradores_disponibles = Colaborador.objects.filter(disponibilidad='disponible').count()
+    colaboradores_ocupados = Colaborador.objects.filter(disponibilidad='ocupado').count()
+    colaboradores_vacaciones = Colaborador.objects.filter(disponibilidad='vacaciones').count()
+
+    total_tareas = Tarea.objects.count()
+    tareas_completadas = Tarea.objects.filter(estado='completada').count()
+    tareas_pendientes = Tarea.objects.filter(estado='pendiente').count()
+    tareas_en_progreso = Tarea.objects.filter(estado='en_progreso').count()
+    tareas_vencidas = Tarea.objects.filter(estado='vencida').count()
+
+    proyectos_recientes = Proyecto.objects.order_by('-id')[:5]
+    tareas_recientes = Tarea.objects.order_by('-id')[:5]
+
+    context = {
+        'total_proyectos': total_proyectos,
+        'proyectos_en_progreso': proyectos_en_progreso,
+        'proyectos_completados': proyectos_completados,
+        'proyectos_en_riesgo': proyectos_en_riesgo,
+        'proyectos_planificacion': proyectos_planificacion,
+        'total_colaboradores': total_colaboradores,
+        'colaboradores_disponibles': colaboradores_disponibles,
+        'colaboradores_ocupados': colaboradores_ocupados,
+        'colaboradores_vacaciones': colaboradores_vacaciones,
+        'total_tareas': total_tareas,
+        'tareas_completadas': tareas_completadas,
+        'tareas_pendientes': tareas_pendientes,
+        'tareas_en_progreso': tareas_en_progreso,
+        'tareas_vencidas': tareas_vencidas,
+        'proyectos_recientes': proyectos_recientes,
+        'tareas_recientes': tareas_recientes,
+    }
+    return render(request, 'dashboard.html', context)
