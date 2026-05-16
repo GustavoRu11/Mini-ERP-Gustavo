@@ -1,12 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from .models import Proyecto, Tarea
 from recursos.models import Colaborador
 
+@login_required
 def lista_proyectos(request):
     proyectos = Proyecto.objects.all()
     return render(request, 'proyectos/lista_proyectos.html', {'proyectos': proyectos})
 
+@login_required
 def crear_proyecto(request):
     colaboradores = Colaborador.objects.all()
     if request.method == 'POST':
@@ -31,11 +35,13 @@ def crear_proyecto(request):
         return redirect('lista_proyectos')
     return render(request, 'proyectos/form_proyecto.html', {'accion': 'Crear', 'colaboradores': colaboradores})
 
+@login_required
 def detalle_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     tareas = proyecto.tareas.all()
     return render(request, 'proyectos/detalle_proyecto.html', {'proyecto': proyecto, 'tareas': tareas})
 
+@login_required
 def editar_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     colaboradores = Colaborador.objects.all()
@@ -53,6 +59,7 @@ def editar_proyecto(request, pk):
         return redirect('lista_proyectos')
     return render(request, 'proyectos/form_proyecto.html', {'accion': 'Editar', 'proyecto': proyecto, 'colaboradores': colaboradores})
 
+@login_required
 def eliminar_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     if request.method == 'POST':
@@ -61,10 +68,12 @@ def eliminar_proyecto(request, pk):
         return redirect('lista_proyectos')
     return render(request, 'proyectos/confirmar_eliminar.html', {'objeto': proyecto, 'tipo': 'proyecto'})
 
+@login_required
 def lista_tareas(request):
     tareas = Tarea.objects.all()
     return render(request, 'proyectos/lista_tareas.html', {'tareas': tareas})
 
+@login_required
 def crear_tarea(request):
     proyectos = Proyecto.objects.all()
     colaboradores = Colaborador.objects.all()
@@ -87,30 +96,24 @@ def crear_tarea(request):
         return redirect('lista_tareas')
     return render(request, 'proyectos/form_tarea.html', {'accion': 'Crear', 'proyectos': proyectos, 'colaboradores': colaboradores})
 
-
-from django.db.models import Count
-
+@login_required
 def dashboard(request):
     total_proyectos = Proyecto.objects.count()
     proyectos_en_progreso = Proyecto.objects.filter(estado='en_progreso').count()
     proyectos_completados = Proyecto.objects.filter(estado='completado').count()
     proyectos_en_riesgo = Proyecto.objects.filter(estado='en_riesgo').count()
     proyectos_planificacion = Proyecto.objects.filter(estado='planificacion').count()
-
     total_colaboradores = Colaborador.objects.count()
     colaboradores_disponibles = Colaborador.objects.filter(disponibilidad='disponible').count()
     colaboradores_ocupados = Colaborador.objects.filter(disponibilidad='ocupado').count()
     colaboradores_vacaciones = Colaborador.objects.filter(disponibilidad='vacaciones').count()
-
     total_tareas = Tarea.objects.count()
     tareas_completadas = Tarea.objects.filter(estado='completada').count()
     tareas_pendientes = Tarea.objects.filter(estado='pendiente').count()
     tareas_en_progreso = Tarea.objects.filter(estado='en_progreso').count()
     tareas_vencidas = Tarea.objects.filter(estado='vencida').count()
-
     proyectos_recientes = Proyecto.objects.order_by('-id')[:5]
     tareas_recientes = Tarea.objects.order_by('-id')[:5]
-
     context = {
         'total_proyectos': total_proyectos,
         'proyectos_en_progreso': proyectos_en_progreso,

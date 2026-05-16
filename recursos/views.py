@@ -1,11 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from .models import Colaborador
 
+@login_required
 def lista_colaboradores(request):
     colaboradores = Colaborador.objects.all()
     return render(request, 'recursos/lista_colaboradores.html', {'colaboradores': colaboradores})
 
+@login_required
 def crear_colaborador(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
@@ -24,6 +27,7 @@ def crear_colaborador(request):
         return redirect('lista_colaboradores')
     return render(request, 'recursos/form_colaborador.html', {'accion': 'Crear'})
 
+@login_required
 def editar_colaborador(request, pk):
     colaborador = get_object_or_404(Colaborador, pk=pk)
     if request.method == 'POST':
@@ -37,6 +41,7 @@ def editar_colaborador(request, pk):
         return redirect('lista_colaboradores')
     return render(request, 'recursos/form_colaborador.html', {'accion': 'Editar', 'colaborador': colaborador})
 
+@login_required
 def eliminar_colaborador(request, pk):
     colaborador = get_object_or_404(Colaborador, pk=pk)
     if request.method == 'POST':
